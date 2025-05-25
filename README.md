@@ -38,14 +38,14 @@ Make sure you have the following installed:
 1.  **Clone the repository**:
 
     ```bash
-    git clone https://github.com/yourusername/todo-summarizer.git
-    cd todo-summarizer
+    git clone https://github.com/KaDiS-Bot/toDo_Backend.git
     ```
 
 2.  **Install dependencies**:
 
     ```bash
     # For backend (from the root or backend folder)
+    cd backend
     npm install
 
     # For frontend (if in a separate folder, navigate into it first)
