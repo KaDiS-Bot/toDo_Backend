@@ -1,31 +1,63 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { getTodos, addTodo, deleteTodo, summarizeTodos } from './api';
 
 function App() {
   const [todos, setTodos] = useState([]);
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchTodos = async () => {
-    const res = await axios.get('http://localhost:5000/todos');
-    setTodos(res.data);
+    try {
+      setError('');
+      const res = await getTodos();
+      setTodos(res.data);
+    } catch (err) {
+      setError('Failed to fetch todos');
+      console.error(err);
+    }
   };
 
-  const addTodo = async () => {
+  const addNewTodo = async () => {
     if (!title.trim()) return;
-    await axios.post('http://localhost:5000/todos', { title });
-    setTitle('');
-    fetchTodos();
+    try {
+      setError('');
+      setLoading(true);
+      await addTodo(title);
+      setTitle('');
+      await fetchTodos();
+    } catch (err) {
+      setError('Failed to add todo');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteTodo = async (id) => {
-    await axios.delete(`http://localhost:5000/todos/${id}`);
-    fetchTodos();
+  const deleteExistingTodo = async (id) => {
+    try {
+      setError('');
+      await deleteTodo(id);
+      await fetchTodos();
+    } catch (err) {
+      setError('Failed to delete todo');
+      console.error(err);
+    }
   };
 
-  const summarizeTodos = async () => {
-    const res = await axios.post('http://localhost:5000/summarize');
-    setSummary(res.data.summary);
+  const generateSummary = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      const res = await summarizeTodos();
+      setSummary(res.data.summary);
+    } catch (err) {
+      setError('Failed to generate summary');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -36,8 +68,12 @@ function App() {
     <div className="min-h-screen bg-black text-green-400 p-8 font-mono flex items-center justify-center">
       <div className="max-w-3xl w-full bg-[#0a0a0a] rounded-xl shadow-[0_0_30px_#00ff99] p-8 space-y-6 border border-green-600/50">
         <h1 className="text-4xl font-extrabold text-center tracking-wide drop-shadow-[0_0_8px_#00ff99]">
-          <span className="text-[#00ff99]"></span> Todo + <span className="text-[#00ff99]">Summarizer</span>
+          Todo + <span className="text-[#00ff99]">Summarizer</span>
         </h1>
+
+        {error && (
+          <div className="text-red-500 text-center mb-4 font-semibold">{error}</div>
+        )}
 
         <div className="flex space-x-3">
           <input
@@ -46,11 +82,13 @@ function App() {
             className="flex-1 bg-[#111111] border border-green-600 rounded px-4 py-3 text-green-300 placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-shadow duration-300 shadow-[0_0_8px_#00ff99]"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && addTodo()}
+            onKeyDown={(e) => e.key === 'Enter' && addNewTodo()}
+            disabled={loading}
           />
           <button
-            onClick={addTodo}
+            onClick={addNewTodo}
             className="bg-green-600 hover:bg-green-500 transition-colors rounded px-6 py-3 font-semibold shadow-[0_0_15px_#00ff99] hover:shadow-[0_0_20px_#00ff99]"
+            disabled={loading}
           >
             Add
           </button>
@@ -67,11 +105,12 @@ function App() {
               key={todo.id}
               className="flex justify-between items-center py-3 hover:bg-green-900/20 rounded transition-colors cursor-default select-text"
             >
-              <span className="break-words">{todo.title}</span> {/* Wrap long text */}
+              <span className="break-words">{todo.title}</span>
               <button
-                onClick={() => deleteTodo(todo.id)}
+                onClick={() => deleteExistingTodo(todo.id)}
                 className="text-red-500 hover:text-red-700 transition-colors"
                 title="Delete Task"
+                disabled={loading}
               >
                 ❌
               </button>
@@ -80,8 +119,9 @@ function App() {
         </ul>
 
         <button
-          onClick={summarizeTodos}
+          onClick={generateSummary}
           className="w-full bg-transparent border-2 border-green-600 hover:bg-green-700/30 text-green-400 hover:text-white font-semibold py-3 rounded shadow-[0_0_15px_#00ff99] hover:shadow-[0_0_25px_#00ff99] transition-all"
+          disabled={loading}
         >
           Summarize Tasks
         </button>
