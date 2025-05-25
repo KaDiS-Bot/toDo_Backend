@@ -1,114 +1,415 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const API_BASE = 'https://to-do-backend-delta.vercel.app/api/todos';
 
-export default function TodoApp() {
+
+import { getTodos, addTodo, deleteTodo, summarizeTodos } from './api';
+
+
+
+
+function App() {
+
+
+
   const [todos, setTodos] = useState([]);
+
   const [title, setTitle] = useState('');
+
+
+  const [summary, setSummary] = useState('');
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  // Fetch all todos
-  async function fetchTodos() {
+
+  const [error, setError] = useState('');
+
+
+
+
+  const fetchTodos = async () => {
+
+
     try {
-      setLoading(true);
-      const res = await fetch(API_BASE);
-      if (!res.ok) throw new Error('Failed to fetch todos');
-      const data = await res.json();
-      setTodos(data);
+
+
+      setError('');
+
+
+      const res = await getTodos();
+
+
+      setTodos(res.data);
+
+
+
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
-  // Add new todo
-  async function addTodo() {
-    if (!title.trim()) return alert('Please enter a todo title');
+
+      setError('Failed to fetch todos');
+
+
+      console.error(err);
+
+
+    }
+
+
+  };
+
+
+
+
+  const addNewTodo = async () => {
+
+
+    if (!title.trim()) return;
+
+
     try {
+
+
+      setError('');
+
       setLoading(true);
-      const res = await fetch(API_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title }),
-      });
-      if (!res.ok) throw new Error('Failed to add todo');
-      const newTodo = await res.json();
-      setTodos([newTodo, ...todos]);
+
+
+      await addTodo(title);
+
+
+
+
+
+
+
+
       setTitle('');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
-  // Delete todo by ID (using query parameter)
-  async function deleteTodo(id) {
-    if (!window.confirm('Are you sure you want to delete this todo?')) return;
-    try {
-      setLoading(true);
-      const res = await fetch(`${API_BASE}?id=${id}`, {
-        method: 'DELETE',
-      });
-      if (res.status !== 204) throw new Error('Failed to delete todo');
-      setTodos(todos.filter((todo) => todo.id !== id));
+
+      await fetchTodos();
+
     } catch (err) {
-      setError(err.message);
+
+
+      setError('Failed to add todo');
+
+
+      console.error(err);
+
     } finally {
+
       setLoading(false);
+
     }
-  }
+
+
+  };
+
+
+
+
+
+  const deleteExistingTodo = async (id) => {
+
+
+    try {
+
+
+      setError('');
+
+
+      await deleteTodo(id);
+
+
+      await fetchTodos();
+
+
+    } catch (err) {
+
+
+      setError('Failed to delete todo');
+
+
+      console.error(err);
+
+
+    }
+
+
+  };
+
+
+
+
+  const generateSummary = async () => {
+
+
+
+    try {
+
+
+      setError('');
+
+      setLoading(true);
+
+
+      const res = await summarizeTodos();
+
+
+      setSummary(res.data.summary);
+
+
+
+
+    } catch (err) {
+
+
+      setError('Failed to generate summary');
+
+
+      console.error(err);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+
+  };
+
+
 
   useEffect(() => {
+
     fetchTodos();
+
   }, []);
 
+
+
   return (
-    <div style={{ maxWidth: 600, margin: 'auto', padding: 20 }}>
-      <h1>Todo List</h1>
-      <input
-        type="text"
-        placeholder="Enter todo title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        style={{ width: '80%', padding: 8 }}
-      />
-      <button onClick={addTodo} style={{ padding: 8, marginLeft: 8 }}>
-        Add
-      </button>
 
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {todos.map((todo) => (
-          <li
-            key={todo.id}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              padding: 8,
-              borderBottom: '1px solid #ccc',
-            }}
+    <div className="min-h-screen bg-black text-green-400 p-8 font-mono flex items-center justify-center">
+
+
+      <div className="max-w-3xl w-full bg-[#0a0a0a] rounded-xl shadow-[0_0_30px_#00ff99] p-8 space-y-6 border border-green-600/50">
+
+
+        <h1 className="text-4xl font-extrabold text-center tracking-wide drop-shadow-[0_0_8px_#00ff99]">
+
+
+          Todo + <span className="text-[#00ff99]">Summarizer</span>
+
+
+        </h1>
+
+
+
+
+
+
+
+
+
+
+
+        {error && (
+
+
+          <div className="text-red-500 text-center mb-4 font-semibold">{error}</div>
+
+
+        )}
+
+
+
+
+        <div className="flex space-x-3">
+
+
+          <input
+
+
+            type="text"
+
+
+            placeholder="Enter new task..."
+
+
+            className="flex-1 bg-[#111111] border border-green-600 rounded px-4 py-3 text-green-300 placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-shadow duration-300 shadow-[0_0_8px_#00ff99]"
+
+
+            value={title}
+
+
+            onChange={(e) => setTitle(e.target.value)}
+
+
+            onKeyDown={(e) => e.key === 'Enter' && addNewTodo()}
+
+
+            disabled={loading}
+
+
+          />
+
+
+          <button
+
+
+            onClick={addNewTodo}
+
+
+            className="bg-green-600 hover:bg-green-500 transition-colors rounded px-6 py-3 font-semibold shadow-[0_0_15px_#00ff99] hover:shadow-[0_0_20px_#00ff99]"
+
+
+            disabled={loading}
+
           >
-            <span>{todo.title}</span>
-            <button
-              onClick={() => deleteTodo(todo.id)}
-              style={{
-                backgroundColor: 'red',
-                color: 'white',
-                border: 'none',
-                padding: '4px 8px',
-                cursor: 'pointer',
-              }}
+
+
+            Add
+
+
+          </button>
+
+
+        </div>
+
+
+
+
+
+        <ul className="divide-y divide-green-700 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-green-600 scrollbar-track-transparent">
+
+
+          {todos.length === 0 && (
+
+
+            <li className="py-4 text-center text-green-700 italic select-none">
+
+
+              No tasks yet. Add something futuristic!
+
+
+            </li>
+
+
+          )}
+
+
+          {todos.map((todo) => (
+
+
+            <li
+
+
+              key={todo.id}
+
+
+              className="flex justify-between items-center py-3 hover:bg-green-900/20 rounded transition-colors cursor-default select-text"
+
             >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
+
+
+              <span className="break-words">{todo.title}</span>
+
+
+              <button
+
+
+                onClick={() => deleteExistingTodo(todo.id)}
+
+
+                className="text-red-500 hover:text-red-700 transition-colors"
+
+
+                title="Delete Task"
+
+
+                disabled={loading}
+
+
+              >
+
+
+                ❌
+
+
+              </button>
+
+
+            </li>
+
+
+          ))}
+
+
+        </ul>
+
+
+
+
+
+        <button
+
+
+          onClick={generateSummary}
+
+
+          className="w-full bg-transparent border-2 border-green-600 hover:bg-green-700/30 text-green-400 hover:text-white font-semibold py-3 rounded shadow-[0_0_15px_#00ff99] hover:shadow-[0_0_25px_#00ff99] transition-all"
+
+
+          disabled={loading}
+
+
+        >
+
+
+          Summarize Tasks
+
+
+        </button>
+
+
+
+
+
+        {summary && (
+
+
+          <div className="bg-[#111111] border border-green-600 rounded p-5 mt-6 shadow-[0_0_20px_#00ff99]">
+
+
+            <h2 className="font-bold text-lg mb-2 tracking-wide text-green-300 drop-shadow-[0_0_6px_#00ff99]">
+
+
+              📋 Summary
+
+
+            </h2>
+
+
+            <p className="whitespace-pre-wrap text-green-400">{summary}</p>
+
+
+          </div>
+
+
+        )}
+
+
+      </div>
+
     </div>
+
   );
+
 }
+
+
+
+
+
+export default App;
