@@ -8,7 +8,7 @@ const summarizeHandler = require('./summarize');
 const app = express();
 
 app.use(cors({
-  origin: 'https://todofrontend-tau.vercel.app', // ✅ your frontend domain
+  origin: 'https://todofrontend-tau.vercel.app', //
   methods: ['GET', 'POST', 'DELETE'],
 }));
 app.use(express.json());
