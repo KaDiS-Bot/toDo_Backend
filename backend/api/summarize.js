@@ -55,7 +55,20 @@ Summary:
     const summary = response.data?.[0]?.summary_text || response.data?.summary_text || '';
     if (!summary) throw new Error('No summary generated');
 
-    res.status(200).json({ message: 'Summary generated.', summary });
+    // Slack webhook post
+    const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
+    if (slackWebhookUrl) {
+      try {
+        await axios.post(slackWebhookUrl, {
+          text: `📝 *Todo Summary:*\n${summary}`
+        });
+      } catch (slackErr) {
+        console.error('Failed to send summary to Slack:', slackErr.message);
+        // Optional: You could decide whether to fail here or continue
+      }
+    }
+
+    res.status(200).json({ message: 'Summary generated and sent to Slack.', summary });
   } catch (err) {
     console.error('Error summarizing:', err.response?.data || err.message);
     res.status(500).json({ message: 'Summarization failed.', error: err.message });
