@@ -1,6 +1,18 @@
 const pool = require('./db');
 
+function setCorsHeaders(res) {
+  res.setHeader('Access-Control-Allow-Origin', 'https://todofrontend-tau.vercel.app'); // ✅ your frontend domain
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
 module.exports = async function handler(req, res) {
+  setCorsHeaders(res);
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end(); // CORS preflight
+  }
+
   try {
     if (req.method === 'GET') {
       const { rows } = await pool.query('SELECT * FROM todos ORDER BY created_at DESC');
@@ -27,9 +39,9 @@ module.exports = async function handler(req, res) {
     }
 
     res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
-    res.status(405).json({ error: `Method ${req.method} not allowed` });
+    return res.status(405).json({ error: `Method ${req.method} not allowed` });
   } catch (err) {
     console.error('Error in /api/todos:', err.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
