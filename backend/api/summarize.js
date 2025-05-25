@@ -1,5 +1,11 @@
 const axios = require('axios');
 const pool = require('./db');
+function setCorsHeaders(res) {
+  res.setHeader('Access-Control-Allow-Origin', 'https://todofrontend-tau.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
