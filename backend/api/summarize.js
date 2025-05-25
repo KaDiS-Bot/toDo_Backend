@@ -1,13 +1,19 @@
 const axios = require('axios');
 const pool = require('./db');
+
 function setCorsHeaders(res) {
   res.setHeader('Access-Control-Allow-Origin', 'https://todofrontend-tau.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
-
 module.exports = async function handler(req, res) {
+  setCorsHeaders(res);
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res.status(405).json({ error: `Method ${req.method} not allowed` });
@@ -15,7 +21,9 @@ module.exports = async function handler(req, res) {
 
   try {
     const { rows } = await pool.query('SELECT title FROM todos WHERE is_complete = false');
-    if (!rows.length) return res.status(200).json({ message: 'No pending todos.', summary: '' });
+    if (!rows.length) {
+      return res.status(200).json({ message: 'No pending todos.', summary: '' });
+    }
 
     const tasksParagraph = rows.map(t => t.title.trim()).join('. ') + '.';
 
