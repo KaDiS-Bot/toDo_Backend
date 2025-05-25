@@ -1,83 +1,105 @@
-SUMMASLACK
+# SUMMASLACK
 
-A sleek and futuristic Todo application enhanced with AI-powered task summarization. Organize your daily tasks and get a clear, concise summary of pending items generated using Hugging Face’s BART model.
-Features
+---
 
-    Add, view, and delete todos
+**SUMMASLACK** is a sleek, futuristic Todo application enhanced with AI-powered task summarization. Organize your daily tasks efficiently and generate clear, concise summaries of your pending items using Hugging Face’s BART model. Additionally, get automatic notifications delivered directly to your Slack channel.
 
-    Summarize pending tasks into a clear paragraph (~150 words)
+## Features
 
-    Modern dark-themed UI with green neon accents
+* **Add, view, and delete todos effortlessly**: Manage your tasks with ease.
+* **Generate detailed task summaries (~150 words) using AI**: Get clear, concise overviews of your pending items.
+* **Modern dark-themed UI with stylish green neon accents**: Enjoy a visually appealing and intuitive interface.
+* **Responsive design with smooth, intuitive interactions**: Access and use the app seamlessly across devices.
+* **Backend powered by PostgreSQL and Hugging Face’s AI API**: Robust and reliable technology stack.
+* **Optional Slack integration**: Receive task summaries in real-time directly to your Slack channel.
 
-    Responsive design with smooth user interactions
+## Tech Stack
 
-    Backend powered by PostgreSQL and AI summarization via Hugging Face API
+* **Frontend**: React, Tailwind CSS
+* **Backend**: Node.js, Express, PostgreSQL
+* **AI Summarization**: Hugging Face Inference API (`facebook/bart-large-cnn`)
+* **Notifications**: Slack Webhook (optional)
 
-    Slack notification integration for task summaries (optional)
+---
 
-Tech Stack
+## Getting Started
 
-    Frontend: React, Tailwind CSS
+### Prerequisites
 
-    Backend: Node.js, Express, PostgreSQL
+Make sure you have the following installed:
 
-    AI Summarization: Hugging Face Inference API (facebook/bart-large-cnn)
+* **Node.js** (v16 or higher recommended)
+* **PostgreSQL** database
+* **Hugging Face API Key**
+* **Slack Webhook URL** (optional, for Slack notifications)
 
-    Notifications: Slack Webhook (optional)
+### Installation
 
-Getting Started
-Prerequisites
+1.  **Clone the repository**:
 
-    Node.js (v16+ recommended)
+    ```bash
+    git clone https://github.com/yourusername/todo-summarizer.git
+    cd todo-summarizer
+    ```
 
-    PostgreSQL
+2.  **Install dependencies**:
 
-    Hugging Face API Key
+    ```bash
+    # For backend (from the root or backend folder)
+    npm install
 
-    Slack Webhook URL (optional)
+    # For frontend (if in a separate folder, navigate into it first)
+    # cd frontend
+    # npm install
+    ```
 
-Installation
+3.  **Configure environment variables**:
 
-    Clone the repository:
+    Create a `.env` file in your **backend** directory with the following:
 
-git clone https://github.com/yourusername/todo-summarizer.git
-cd todo-summarizer
+    ```env
+    DATABASE_URL=your_postgres_connection_string
+    HUGGINGFACE_API_KEY=your_huggingface_api_key
+    SLACK_WEBHOOK_URL=your_slack_webhook_url #(optional)
+    ```
 
-    Install dependencies for frontend and backend:
+4.  **Set up the database**:
 
-# In root or backend folder
-npm install
+    Run migrations or create the necessary tables as required. (This step will depend on your specific database setup; you might use `knex migrate:latest` or similar commands if you have a migration tool, or just create tables manually.)
 
-# In frontend folder (if separated)
-npm install
+5.  **Start the backend server**:
 
-    Set up environment variables (.env file):
+    ```bash
+    npm run dev
+    ```
 
-DATABASE_URL=your_postgres_connection_string
-HUGGINGFACE_API_KEY=your_huggingface_api_key
-SLACK_WEBHOOK_URL=your_slack_webhook_url (optional)
+6.  **Start the frontend server**:
 
-    Run database migrations or setup (if applicable)
+    ```bash
+    npm run dev
+    ```
 
-    Start the backend server:
+---
 
-npm run dev
+## Usage
 
-    Start the frontend:
+1.  Access the app via your browser at `http://localhost:3000` (or your deployed URL).
+2.  Add your tasks using the input field and submit them.
+3.  Click **Summarize Tasks** to generate a clear AI summary of your pending todos.
+4.  If Slack integration is enabled, the summary will automatically be sent to your configured Slack channel.
 
-npm run dev
+---
 
-Usage
+## Project Structure
 
-    Open the app in your browser.
+```
+/backend            # Node.js backend API code
+/frontend           # React frontend application
+```
 
-    Add tasks in the input field and press Add or Enter.
+---
 
-    Click Summarize Tasks to get a summary of your pending tasks.
+## Contributing
 
-    (If Slack configured) Summaries will be sent to your Slack channel automatically.
-
-Folder Structure
-
-/backend - Node.js backend API
-/frontend - React frontend app
+Contributions, issues, and feature requests are welcome!
+Feel free to fork the repository and submit pull requests.
