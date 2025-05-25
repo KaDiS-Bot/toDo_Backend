@@ -1,5 +1,6 @@
 import axios from 'axios';
-const API_URL = 'http://localhost:5000';
+
+const API_URL = 'https://to-do-backend-delta.vercel.app/api';
 
 export const getTodos = () => axios.get(`${API_URL}/todos`);
 export const addTodo = (title) => axios.post(`${API_URL}/todos`, { title });
